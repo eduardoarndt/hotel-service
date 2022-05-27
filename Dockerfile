@@ -16,6 +16,7 @@ COPY ./data ./data
 ENV PORT 3000
 EXPOSE 3000
 
+ENV GIN_MODE release
 RUN go build -o /hotel-service
 
 CMD [ "/hotel-service" ]

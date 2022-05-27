@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/eduardoarndt/hotel-service/data"
@@ -31,14 +32,19 @@ func ReadAllHotels(c *gin.Context) {
 func ReadHotelById(c *gin.Context) {
 	id := c.Param("id")
 
-	for _, a := range data.Hotels {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
+	hotel, err := data.GetHotel(id)
+	fmt.Println(hotel, err)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			returnNotFound(c)
 			return
 		}
+
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{})
+		return
 	}
 
-	returnNotFound(c)
+	c.IndentedJSON(http.StatusOK, hotel)
 }
 
 func UpdateHotel(c *gin.Context) {

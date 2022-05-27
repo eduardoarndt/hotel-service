@@ -36,6 +36,18 @@ func Connect() {
 	fmt.Println("[Postgres] Connected!")
 }
 
+func GetHotel(id string) (*domain.Hotel, error) {
+	sql := db.QueryRow(fmt.Sprintf("select * from hotel where id = %v;", id))
+
+	var hotel domain.Hotel
+	err := sql.Scan(&hotel.ID, &hotel.Name, &hotel.Address, &hotel.City, &hotel.Reviews, &hotel.Rating)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hotel, nil
+}
+
 func GetAllHotels() ([]domain.Hotel, error) {
 	sql, err := db.Query("select * from hotel;")
 	if err != nil {
