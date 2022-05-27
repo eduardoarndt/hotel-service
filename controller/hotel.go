@@ -48,8 +48,7 @@ func UpdateHotel(c *gin.Context) {
 
 	for index := range data.Hotels {
 		if data.Hotels[index].ID == id {
-			data.Hotels[index].Name = updateHotel.Name
-			data.Hotels[index].Address = updateHotel.Address
+			data.Hotels[index] = updateHotel
 			c.IndentedJSON(http.StatusOK, data.Hotels[index])
 			return
 		}
