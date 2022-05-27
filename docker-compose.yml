@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:14.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+  hotel-service:
+    container_name: hotel-service
+    build:
+      context: ./
+    image: eduardoarndt/hotel-service
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+    links:
+      - postgres
+volumes:
+  postgres:
+    driver: local
