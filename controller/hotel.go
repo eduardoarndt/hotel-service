@@ -21,7 +21,11 @@ func CreateHotel(c *gin.Context) {
 }
 
 func ReadAllHotels(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, data.Hotels)
+	hotels, err := data.GetAllHotels()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{})
+	}
+	c.IndentedJSON(http.StatusOK, hotels)
 }
 
 func ReadHotelById(c *gin.Context) {
