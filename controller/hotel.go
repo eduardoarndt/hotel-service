@@ -11,17 +11,17 @@ import (
 
 func CreateHotel(c *gin.Context) {
 	var newHotel domain.Hotel
-
 	if err := c.BindJSON(&newHotel); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	err := data.CreateHotel(newHotel)
+	insertedId, err := data.CreateHotel(newHotel)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 	}
 
+	newHotel.ID = fmt.Sprint(*insertedId)
 	c.IndentedJSON(http.StatusOK, newHotel)
 }
 
@@ -37,7 +37,6 @@ func ReadHotelById(c *gin.Context) {
 	id := c.Param("id")
 
 	hotel, err := data.GetHotel(id)
-	fmt.Println(hotel, err)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			returnNotFound(c)
@@ -58,17 +57,26 @@ func UpdateHotel(c *gin.Context) {
 	err := c.BindJSON(&updateHotel)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
 
-	for index := range data.Hotels {
-		if data.Hotels[index].ID == id {
-			data.Hotels[index] = updateHotel
-			c.IndentedJSON(http.StatusOK, data.Hotels[index])
+	if updateHotel.ID != "" {
+		if id != updateHotel.ID {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "ids dont match"})
 			return
 		}
+	} else {
+		updateHotel.ID = id
 	}
 
-	returnNotFound(c)
+	err = data.UpdateHotel(updateHotel)
+	if err != nil {
+		fmt.Println("error updating...")
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, updateHotel)
 }
 
 func DeleteHotel(c *gin.Context) {

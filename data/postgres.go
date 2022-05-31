@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 
 	_ "github.com/lib/pq"
 
@@ -36,9 +37,26 @@ func Connect() {
 	fmt.Println("[Postgres] Connected!")
 }
 
-func CreateHotel(hotel domain.Hotel) error {
-	sql := `insert into hotel (name, address, city, reviews, rating) values ($1, $2, $3, $4, $5)`
-	_, err := db.Exec(sql, hotel.Name, hotel.Address, hotel.City, hotel.Reviews, hotel.Rating)
+func CreateHotel(hotel domain.Hotel) (*int, error) {
+	sql := `insert into hotel (name, address, city, reviews, rating) values ($1, $2, $3, $4, $5) returning id`
+	id := 0
+	err := db.QueryRow(sql, hotel.Name, hotel.Address, hotel.City, hotel.Reviews, hotel.Rating).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &id, nil
+}
+
+func UpdateHotel(hotel domain.Hotel) error {
+	fmt.Println(hotel)
+	sql := `update hotel set (name, address, city, reviews, rating) = ($1, $2, $3, $4, $5) where id = $6`
+	hotelId, err := strconv.Atoi(hotel.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(sql, hotel.Name, hotel.Address, hotel.City, hotel.Reviews, hotel.Rating, hotelId)
 	if err != nil {
 		return err
 	}
