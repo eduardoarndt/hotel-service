@@ -82,19 +82,11 @@ func UpdateHotel(c *gin.Context) {
 func DeleteHotel(c *gin.Context) {
 	id := c.Param("id")
 
-	for index := range data.Hotels {
-		if data.Hotels[index].ID == id {
-			data.Hotels = removeIndex(data.Hotels, index)
-			c.IndentedJSON(http.StatusOK, gin.H{"message": "ok"})
-			return
-		}
+	err := data.DeleteHotel(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
-
-	returnNotFound(c)
-}
-
-func removeIndex(hotels []domain.Hotel, index int) []domain.Hotel {
-	return append(hotels[:index], hotels[index+1:]...)
 }
 
 func returnNotFound(c *gin.Context) {

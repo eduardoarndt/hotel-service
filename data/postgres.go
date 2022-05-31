@@ -64,6 +64,15 @@ func UpdateHotel(hotel domain.Hotel) error {
 	return nil
 }
 
+func DeleteHotel(id string) error {
+	sql := `delete from hotel where id = $1`
+	_, err := db.Exec(sql, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetHotel(id string) (*domain.Hotel, error) {
 	sql := db.QueryRow(fmt.Sprintf("select * from hotel where id = %v;", id))
 
