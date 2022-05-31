@@ -17,7 +17,11 @@ func CreateHotel(c *gin.Context) {
 		return
 	}
 
-	data.Hotels = append(data.Hotels, newHotel)
+	err := data.CreateHotel(newHotel)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	}
+
 	c.IndentedJSON(http.StatusOK, newHotel)
 }
 

@@ -36,6 +36,16 @@ func Connect() {
 	fmt.Println("[Postgres] Connected!")
 }
 
+func CreateHotel(hotel domain.Hotel) error {
+	sql := `insert into hotel (name, address, city, reviews, rating) values ($1, $2, $3, $4, $5)`
+	_, err := db.Exec(sql, hotel.Name, hotel.Address, hotel.City, hotel.Reviews, hotel.Rating)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetHotel(id string) (*domain.Hotel, error) {
 	sql := db.QueryRow(fmt.Sprintf("select * from hotel where id = %v;", id))
 
